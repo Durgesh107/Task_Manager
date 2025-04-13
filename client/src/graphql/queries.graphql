@@ -1,0 +1,25 @@
+query getsingletask($getsingletaskId: Int!){
+  getsingletask(id: $getsingletaskId) {
+    isComplete,
+    title,
+    updated,
+    id
+    created
+    isComplete
+  }
+}
+
+
+query gettasks{
+  getTasks {
+    created,
+    id,
+    isComplete,
+    title,
+    updated
+  }
+}
+
+query hello{
+  hello
+}
