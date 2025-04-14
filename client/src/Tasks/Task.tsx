@@ -15,7 +15,9 @@ const Tasks: React.FC = () => {
   const [title, setTitle] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [editTitle, setEditTitle] = useState("");
+  const [editIsComplete, setEditIsComplete] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+  const [filterStatus, setFilterStatus] = useState<boolean | null>(null);
 
   if (loading) return (
     <div className="bg-black min-h-screen text-white flex justify-center items-center">
@@ -48,6 +50,10 @@ const Tasks: React.FC = () => {
     </div>
   );
 
+  const filteredTasks = data?.getTasks?.filter(task => 
+    filterStatus === null ? true : task.isComplete === filterStatus
+  );
+
   const handleDelete = async (id: number) => {
     try {
       await deleteTask({
@@ -67,12 +73,27 @@ const Tasks: React.FC = () => {
       await editTask({
         variables: {
           title: editTitle,
-          isComplete: false,
+          isComplete: editIsComplete,
           editTaskId: editingTaskId,
         },
         refetchQueries: ["gettasks"],
       });
       closeModal();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleToggleComplete = async (id: number, title: string, currentStatus: boolean) => {
+    try {
+      await editTask({
+        variables: {
+          title,
+          isComplete: !currentStatus,
+          editTaskId: id,
+        },
+        refetchQueries: ["gettasks"],
+      });
     } catch (err) {
       console.error(err);
     }
@@ -93,9 +114,10 @@ const Tasks: React.FC = () => {
     }
   };
 
-  const openModal = (taskId: number, currentTitle: string) => {
+  const openModal = (taskId: number, currentTitle: string, currentIsComplete: boolean) => {
     setEditingTaskId(taskId);
     setEditTitle(currentTitle);
+    setEditIsComplete(currentIsComplete);
     setModalIsOpen(true);
   };
 
@@ -103,6 +125,14 @@ const Tasks: React.FC = () => {
     setModalIsOpen(false);
     setEditingTaskId(null);
     setEditTitle("");
+    setEditIsComplete(false);
+  };
+
+  const toggleFilter = () => {
+    // Cycle through: null (all) -> true (completed) -> false (not completed) -> null (all)
+    if (filterStatus === null) setFilterStatus(true);
+    else if (filterStatus === true) setFilterStatus(false);
+    else setFilterStatus(null);
   };
 
   const containerVariants = {
@@ -193,6 +223,48 @@ const Tasks: React.FC = () => {
           </motion.button>
         </motion.div>
         
+        {/* Filter toggle */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="flex justify-center mt-5"
+        >
+          <div className="flex items-center gap-2 bg-gray-800 bg-opacity-50 px-4 py-2 rounded-lg border border-gray-700">
+            
+            <button 
+              onClick={toggleFilter}
+              className={`px-3 py-1 rounded-md transition-colors ${
+                filterStatus === null 
+                  ? 'bg-purple-600 text-white' 
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              All
+            </button>
+            <button 
+              onClick={() => setFilterStatus(true)}
+              className={`px-3 py-1 rounded-md transition-colors ${
+                filterStatus === true 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              Completed
+            </button>
+            <button 
+              onClick={() => setFilterStatus(false)}
+              className={`px-3 py-1 rounded-md transition-colors ${
+                filterStatus === false 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              Active
+            </button>
+          </div>
+        </motion.div>
+        
         <div className="flex justify-center items-center">
           <motion.div 
             variants={containerVariants}
@@ -201,7 +273,7 @@ const Tasks: React.FC = () => {
             className="mt-10 px-4 md:px-10 w-full max-w-3xl"
           >
             <AnimatePresence>
-              {data?.getTasks?.map((task) => (
+              {filteredTasks?.map((task) => (
                 <motion.div
                   key={task.id}
                   variants={taskVariants}
@@ -209,9 +281,31 @@ const Tasks: React.FC = () => {
                   animate="visible"
                   exit="exit"
                   layout
-                  className="flex flex-col md:flex-row justify-between items-center gap-4 mt-4 bg-gray-800 bg-opacity-50 p-5 rounded-xl backdrop-blur-sm shadow-lg border border-gray-700 hover:border-purple-500 transition-all duration-300"
+                  className={`flex flex-col md:flex-row justify-between items-center gap-4 mt-4 
+                    ${task.isComplete ? 'bg-gray-700 bg-opacity-30' : 'bg-gray-800 bg-opacity-50'} 
+                    p-5 rounded-xl backdrop-blur-sm shadow-lg border border-gray-700 
+                    hover:border-purple-500 transition-all duration-300`}
                 >
-                  <div className="text-white text-center md:text-left text-lg">{task.title}</div>
+                  <div className="flex items-center gap-3 w-full md:w-auto">
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleToggleComplete(task.id, task.title, task.isComplete)}
+                      className={`w-6 h-6 rounded-md border-2 flex items-center justify-center cursor-pointer
+                        ${task.isComplete 
+                          ? 'border-green-500 bg-green-500 bg-opacity-30' 
+                          : 'border-gray-500'}`}
+                    >
+                      {task.isComplete && (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </motion.div>
+                    <div className={`text-white text-center md:text-left text-lg ${task.isComplete ? 'line-through text-gray-400' : ''}`}>
+                      {task.title}
+                    </div>
+                  </div>
                   <div className="flex gap-2">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -225,7 +319,7 @@ const Tasks: React.FC = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className="bg-indigo-500 hover:bg-indigo-600 text-white p-2 rounded-lg cursor-pointer w-full md:w-auto transition-colors duration-300 font-medium"
-                      onClick={() => openModal(task.id, task.title)}
+                      onClick={() => openModal(task.id, task.title, task.isComplete)}
                     >
                       EDIT
                     </motion.button>
@@ -234,14 +328,18 @@ const Tasks: React.FC = () => {
               ))}
             </AnimatePresence>
             
-            {data?.getTasks?.length === 0 && (
+            {filteredTasks?.length === 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 className="text-center text-gray-400 mt-10"
               >
-                No tasks yet. Add your first task above!
+                {filterStatus === null 
+                  ? "No tasks yet. Add your first task above!" 
+                  : filterStatus 
+                    ? "No completed tasks yet." 
+                    : "No active tasks - everything's done!"}
               </motion.div>
             )}
           </motion.div>
@@ -277,6 +375,35 @@ const Tasks: React.FC = () => {
                 placeholder="Update task title"
                 className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-purple-500 focus:outline-none mb-4"
               />
+              
+              <motion.div 
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="flex items-center gap-3 mb-4"
+              >
+                <label className="flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={editIsComplete}
+                    onChange={() => setEditIsComplete(!editIsComplete)}
+                    className="hidden" 
+                  />
+                  <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center
+                    ${editIsComplete 
+                      ? 'border-green-500 bg-green-500 bg-opacity-30' 
+                      : 'border-gray-500'}`}
+                  >
+                    {editIsComplete && (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="ml-2">Mark as complete</span>
+                </label>
+              </motion.div>
+              
               <div className="flex justify-end gap-4">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
