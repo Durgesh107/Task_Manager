@@ -231,7 +231,7 @@ const Tasks: React.FC = () => {
           className="flex justify-center mt-5"
         >
           <div className="flex items-center gap-2 bg-gray-800 bg-opacity-50 px-4 py-2 rounded-lg border border-gray-700">
-            <span>Filter:</span>
+            
             <button 
               onClick={toggleFilter}
               className={`px-3 py-1 rounded-md transition-colors ${
