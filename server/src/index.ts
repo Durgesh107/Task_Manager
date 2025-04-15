@@ -48,7 +48,7 @@ const bootstrap = async () => {
     }) as any
   );
 
-  const PORT = process.env.PORT ? parseInt(process.env.PORT,10) : 8000;
+  const PORT = process.env.PORT ? parseInt(process.env.PORT,10) : 4000;
   await new Promise<void>(resolve =>
     httpServer.listen({ port: PORT }, resolve)
   );
