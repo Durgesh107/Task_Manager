@@ -17,6 +17,10 @@ export class Task extends BaseEntity{
     @Field(()=>Boolean)
     isComplete:boolean
 
+    @Column({default:"medium"})
+    @Field(()=>String)
+    priority:string
+
     @CreateDateColumn()
     @Field(()=>String)
     created:Date

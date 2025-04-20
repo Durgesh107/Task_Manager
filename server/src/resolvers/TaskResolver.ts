@@ -24,9 +24,10 @@ export class TaskResolver{
 
     @Mutation(()=>Task)
     async createTask(
-        @Arg("title",()=>String) title:string
+        @Arg("title",()=>String) title:string,
+        @Arg("priority",()=>String) priority:string
     ):Promise<Task>{
-      const task=await Task.create({title,isComplete:false}).save()
+      const task=await Task.create({title,priority,isComplete:false}).save()
       return task;
     }
 
@@ -52,16 +53,18 @@ export class TaskResolver{
     async editTask(
         @Arg("id",()=>Int) id:number ,
         @Arg("isComplete",()=>Boolean) isComplete:boolean,
-        @Arg("title",()=>String) title:string
+        @Arg("title",()=>String) title:string,
+        @Arg("priority",()=>String ,{nullable:true}) priority:string
     ):Promise<Task | null>{
         const task=await Task.findOne({where:{id}})
         if(!task){
             return null;
         }
         try{
-            await Task.update({ id }, { isComplete, title });
-            const editedTask = await Task.findOne({ where: { id } });
-            return editedTask;
+            const updateData:any={isComplete,title};
+            if (priority !== undefined) updateData.priority = priority;
+            await Task.update({ id }, updateData);
+            return Task.findOne({ where: { id } });
         }catch{
             return null;
         }

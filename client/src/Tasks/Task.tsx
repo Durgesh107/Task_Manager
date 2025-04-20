@@ -206,30 +206,6 @@ const Tasks: React.FC = () => {
             TASKS
           </h2>
         </motion.div>
-        {/* <motion.div 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="flex flex-col md:flex-row justify-center gap-3 px-4 items-center"
-        >
-          <motion.input
-            whileFocus={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 400 }}
-            type="text"
-            placeholder="Enter your task"
-            className="mt-5 border w-full md:w-[60vh] p-4 rounded-lg bg-gray-800 border-gray-700 focus:border-purple-500 focus:outline-none"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 mt-5 p-3 h-12 rounded-lg cursor-pointer w-[30%] md:w-auto flex justify-center font-bold shadow-lg"
-            onClick={handleCreate}
-          >
-            ADD
-          </motion.button>
-        </motion.div> */}
 
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
@@ -253,7 +229,7 @@ const Tasks: React.FC = () => {
           >
             <option value="high">Hard</option>
             <option value="medium">Medium</option>
-            <option value="low">Low</option>
+            <option value="low">Easy</option>
           </motion.select>
 
 
@@ -443,7 +419,7 @@ const Tasks: React.FC = () => {
                 >
                 <option value="high">Hard</option>
                 <option value="medium">Medium</option>
-                <option value="low">Low</option>
+                <option value="low">Easy</option>
                 </motion.select>
               <div className="flex items-center gap-3">
               <div onClick={() => setEditIsComplete(!editIsComplete)} className={`w-6 h-6 rounded-md border-2 flex items-center justify-center cursor-pointer
