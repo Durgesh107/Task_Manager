@@ -1,25 +1,25 @@
-mutation createtask($title: String!){
-  createTask(title: $title) {
-    title,
-    id,
-    isComplete,
-    updated,
+mutation CreateTask($priority: String!, $title: String!) {
+  createTask(priority: $priority, title: $title) {
+    id
+    title
+    isComplete
+    priority
     created
+    updated
   }
 }
 
-
-mutation deletetask($deleteTaskId: Int!){
+mutation delete($deleteTaskId: Int!){
   deleteTask(id: $deleteTaskId)
 }
 
-
-mutation editTask($title: String!, $isComplete: Boolean!, $editTaskId: Int!){
-  editTask(title: $title, isComplete: $isComplete, id: $editTaskId){
-    title,
-    created,
-    isComplete,
-    id,
+mutation EditTask($title: String!, $isComplete: Boolean!, $editTaskId: Int!, $priority: String) {
+  editTask(title: $title, isComplete: $isComplete, id: $editTaskId, priority: $priority) {
+    id
+    title
+    isComplete
+    priority
+    created
     updated
   }
 }

@@ -1,23 +1,28 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  useCreatetaskMutation,
-  useDeletetaskMutation,
+  useCreateTaskMutation,
+  useDeleteMutation,
   useEditTaskMutation,
-  useGettasksQuery,
+  useGetTasksQuery,
 } from "../generated/graphql";
+import { toast, ToastContainer } from "react-toastify";
 
 const Tasks: React.FC = () => {
-  const { loading, data, error } = useGettasksQuery();
-  const [deleteTask] = useDeletetaskMutation();
-  const [createTask] = useCreatetaskMutation();
+  const { loading, data, error } = useGetTasksQuery();
+  const [deleteTask] = useDeleteMutation();
+  const [createTask] = useCreateTaskMutation();
   const [editTask] = useEditTaskMutation();
   const [title, setTitle] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editIsComplete, setEditIsComplete] = useState(false);
+  const [editPriority, setEditPriority] = useState("medium");
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [filterStatus, setFilterStatus] = useState<boolean | null>(null);
+  const [priority, setPriority] = useState("medium");
+  
+
 
   if (loading) return (
     <div className="bg-black min-h-screen text-white flex justify-center items-center">
@@ -49,24 +54,24 @@ const Tasks: React.FC = () => {
       </motion.div>
     </div>
   );
-
   const filteredTasks = data?.getTasks?.filter(task => 
     filterStatus === null ? true : task.isComplete === filterStatus
   );
-
   const handleDelete = async (id: number) => {
     try {
       await deleteTask({
         variables: {
           deleteTaskId: id,
         },
-        refetchQueries: ["gettasks"],
+        refetchQueries: ["GetTasks"],
       });
+      toast.success("successfully deleted the task",{
+      })
     } catch (err) {
       console.error(err);
+      toast.error("an error occured!");
     }
   };
-
   const handleEdit = async () => {
     if (!editTitle.trim() || editingTaskId === null) return;
     try {
@@ -74,16 +79,18 @@ const Tasks: React.FC = () => {
         variables: {
           title: editTitle,
           isComplete: editIsComplete,
+          priority: editPriority,
           editTaskId: editingTaskId,
         },
-        refetchQueries: ["gettasks"],
+        refetchQueries: ["GetTasks"],
       });
       closeModal();
+      toast.success("successfully edited the task!")
     } catch (err) {
       console.error(err);
+      toast.error("an error occured!");
     }
   };
-
   const handleToggleComplete = async (id: number, title: string, currentStatus: boolean) => {
     try {
       await editTask({
@@ -92,49 +99,51 @@ const Tasks: React.FC = () => {
           isComplete: !currentStatus,
           editTaskId: id,
         },
-        refetchQueries: ["gettasks"],
+        refetchQueries: ["GetTasks"],
       });
     } catch (err) {
       console.error(err);
     }
   };
-
   const handleCreate = async () => {
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      toast.warn("Please enter a title");
+      return;
+    }
     try {
       await createTask({
         variables: {
           title,
+          priority
         },
-        refetchQueries: ["gettasks"],
+        refetchQueries: ["GetTasks"],
       });
       setTitle("");
+      toast.success("successfully added the task!");
     } catch (err) {
       console.log(err);
+      toast.error("could not add the task!")
     }
   };
-
-  const openModal = (taskId: number, currentTitle: string, currentIsComplete: boolean) => {
+  
+  const openModal = (taskId: number, currentTitle: string, currentIsComplete: boolean, currentPriority: string) => {
     setEditingTaskId(taskId);
     setEditTitle(currentTitle);
     setEditIsComplete(currentIsComplete);
+    setEditPriority(currentPriority);
     setModalIsOpen(true);
   };
-
   const closeModal = () => {
     setModalIsOpen(false);
     setEditingTaskId(null);
     setEditTitle("");
     setEditIsComplete(false);
   };
-
   const toggleFilter = () => {
-    // Cycle through: null (all) -> true (completed) -> false (not completed) -> null (all)
     if (filterStatus === null) setFilterStatus(true);
     else if (filterStatus === true) setFilterStatus(false);
     else setFilterStatus(null);
   };
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -197,8 +206,7 @@ const Tasks: React.FC = () => {
             TASKS
           </h2>
         </motion.div>
-
-        <motion.div 
+        {/* <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
@@ -221,9 +229,43 @@ const Tasks: React.FC = () => {
           >
             ADD
           </motion.button>
+        </motion.div> */}
+
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="flex flex-col md:flex-row justify-center gap-3 px-4 items-center"
+        >
+          <motion.input
+            whileFocus={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 400 }}
+            type="text"
+            placeholder="Enter your task"
+            className="mt-5 border w-full md:w-[60vh] p-4 rounded-lg bg-gray-800 border-gray-700 focus:border-purple-500 focus:outline-none"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <motion.select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+            className="mt-5 border w-full md:w-[20vh] p-4 rounded-lg bg-gray-800 border-gray-700 focus:border-purple-500 focus:outline-none"
+          >
+            <option value="high">Hard</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </motion.select>
+
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 mt-5 p-3 h-12 rounded-lg cursor-pointer w-[30%] md:w-auto flex justify-center font-bold shadow-lg"
+            onClick={handleCreate}
+          >
+            ADD
+          </motion.button>
         </motion.div>
-        
-        {/* Filter toggle */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -231,7 +273,6 @@ const Tasks: React.FC = () => {
           className="flex justify-center mt-5"
         >
           <div className="flex items-center gap-2 bg-gray-800 bg-opacity-50 px-4 py-2 rounded-lg border border-gray-700">
-            
             <button 
               onClick={toggleFilter}
               className={`px-3 py-1 rounded-md transition-colors ${
@@ -305,6 +346,17 @@ const Tasks: React.FC = () => {
                     <div className={`text-white text-center md:text-left text-lg ${task.isComplete ? 'line-through text-gray-400' : ''}`}>
                       {task.title}
                     </div>
+                    <div className={`text-sm font-semibold px-2 py-1 rounded
+                  ${
+                    task.priority === "high"
+                      ? "bg-red-500 text-white"
+                      : task.priority === "medium"
+                      ? "bg-yellow-400 text-black"
+                      : "bg-green-400 text-black"
+                  }`}
+                >
+                  {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                </div>
                   </div>
                   <div className="flex gap-2">
                     <motion.button
@@ -319,7 +371,7 @@ const Tasks: React.FC = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className="bg-indigo-500 hover:bg-indigo-600 text-white p-2 rounded-lg cursor-pointer w-full md:w-auto transition-colors duration-300 font-medium"
-                      onClick={() => openModal(task.id, task.title, task.isComplete)}
+                      onClick={() => openModal(task.id, task.title, task.isComplete,task.priority)}
                     >
                       EDIT
                     </motion.button>
@@ -343,7 +395,9 @@ const Tasks: React.FC = () => {
               </motion.div>
             )}
           </motion.div>
+          <ToastContainer/>
         </div>
+     
       </div>
 
       <AnimatePresence>
@@ -377,32 +431,33 @@ const Tasks: React.FC = () => {
               />
               
               <motion.div 
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="flex items-center gap-3 mb-4"
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="flex flex-col gap-4 mb-4"
               >
-                <label className="flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={editIsComplete}
-                    onChange={() => setEditIsComplete(!editIsComplete)}
-                    className="hidden" 
-                  />
-                  <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center
-                    ${editIsComplete 
-                      ? 'border-green-500 bg-green-500 bg-opacity-30' 
-                      : 'border-gray-500'}`}
-                  >
-                    {editIsComplete && (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </div>
-                  <span className="ml-2">Mark as complete</span>
-                </label>
-              </motion.div>
+                <motion.select
+                value={editPriority}
+                onChange={(e) => setEditPriority(e.target.value)}
+                className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-purple-500 focus:outline-none"
+                >
+                <option value="high">Hard</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+                </motion.select>
+              <div className="flex items-center gap-3">
+              <div onClick={() => setEditIsComplete(!editIsComplete)} className={`w-6 h-6 rounded-md border-2 flex items-center justify-center cursor-pointer
+              ${editIsComplete ? 'border-green-500 bg-green-500 bg-opacity-30' : 'border-gray-500'}`}>
+               {editIsComplete && (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+               </svg>
+               )}
+              </div>
+             <div className="text-sm">Mark as complete</div>
+            </div>
+          </motion.div>
+
               
               <div className="flex justify-end gap-4">
                 <motion.button
@@ -423,6 +478,9 @@ const Tasks: React.FC = () => {
                 </motion.button>
               </div>
             </motion.div>
+
+
+            
           </motion.div>
         )}
       </AnimatePresence>

@@ -26,6 +26,7 @@ export type Mutation = {
 
 
 export type MutationCreateTaskArgs = {
+  priority: Scalars['String']['input'];
   title: Scalars['String']['input'];
 };
 
@@ -38,6 +39,7 @@ export type MutationDeleteTaskArgs = {
 export type MutationEditTaskArgs = {
   id: Scalars['Int']['input'];
   isComplete: Scalars['Boolean']['input'];
+  priority?: InputMaybe<Scalars['String']['input']>;
   title: Scalars['String']['input'];
 };
 
@@ -58,44 +60,47 @@ export type Task = {
   created: Scalars['String']['output'];
   id: Scalars['Int']['output'];
   isComplete: Scalars['Boolean']['output'];
+  priority: Scalars['String']['output'];
   title: Scalars['String']['output'];
   updated: Scalars['String']['output'];
 };
 
-export type CreatetaskMutationVariables = Exact<{
+export type CreateTaskMutationVariables = Exact<{
+  priority: Scalars['String']['input'];
   title: Scalars['String']['input'];
 }>;
 
 
-export type CreatetaskMutation = { __typename?: 'Mutation', createTask: { __typename?: 'Task', title: string, id: number, isComplete: boolean, updated: string, created: string } };
+export type CreateTaskMutation = { __typename?: 'Mutation', createTask: { __typename?: 'Task', id: number, title: string, isComplete: boolean, priority: string, created: string, updated: string } };
 
-export type DeletetaskMutationVariables = Exact<{
+export type DeleteMutationVariables = Exact<{
   deleteTaskId: Scalars['Int']['input'];
 }>;
 
 
-export type DeletetaskMutation = { __typename?: 'Mutation', deleteTask: boolean };
+export type DeleteMutation = { __typename?: 'Mutation', deleteTask: boolean };
 
 export type EditTaskMutationVariables = Exact<{
   title: Scalars['String']['input'];
   isComplete: Scalars['Boolean']['input'];
   editTaskId: Scalars['Int']['input'];
+  priority?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type EditTaskMutation = { __typename?: 'Mutation', editTask?: { __typename?: 'Task', title: string, created: string, isComplete: boolean, id: number, updated: string } | null };
+export type EditTaskMutation = { __typename?: 'Mutation', editTask?: { __typename?: 'Task', id: number, title: string, isComplete: boolean, priority: string, created: string, updated: string } | null };
 
 export type GetsingletaskQueryVariables = Exact<{
   getsingletaskId: Scalars['Int']['input'];
 }>;
 
 
-export type GetsingletaskQuery = { __typename?: 'Query', getsingletask?: { __typename?: 'Task', isComplete: boolean, title: string, updated: string, id: number, created: string } | null };
+export type GetsingletaskQuery = { __typename?: 'Query', getsingletask?: { __typename?: 'Task', id: number, title: string, isComplete: boolean, priority: string, created: string, updated: string } | null };
 
-export type GettasksQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetTasksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GettasksQuery = { __typename?: 'Query', getTasks?: Array<{ __typename?: 'Task', created: string, id: number, isComplete: boolean, title: string, updated: string }> | null };
+export type GetTasksQuery = { __typename?: 'Query', getTasks?: Array<{ __typename?: 'Task', id: number, title: string, isComplete: boolean, priority: string, created: string, updated: string }> | null };
 
 export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -103,81 +108,89 @@ export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
 export type HelloQuery = { __typename?: 'Query', hello: string };
 
 
-export const CreatetaskDocument = gql`
-    mutation createtask($title: String!) {
-  createTask(title: $title) {
-    title
+export const CreateTaskDocument = gql`
+    mutation CreateTask($priority: String!, $title: String!) {
+  createTask(priority: $priority, title: $title) {
     id
+    title
     isComplete
-    updated
+    priority
     created
+    updated
   }
 }
     `;
-export type CreatetaskMutationFn = Apollo.MutationFunction<CreatetaskMutation, CreatetaskMutationVariables>;
+export type CreateTaskMutationFn = Apollo.MutationFunction<CreateTaskMutation, CreateTaskMutationVariables>;
 
 /**
- * __useCreatetaskMutation__
+ * __useCreateTaskMutation__
  *
- * To run a mutation, you first call `useCreatetaskMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreatetaskMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCreateTaskMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTaskMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createtaskMutation, { data, loading, error }] = useCreatetaskMutation({
+ * const [createTaskMutation, { data, loading, error }] = useCreateTaskMutation({
  *   variables: {
+ *      priority: // value for 'priority'
  *      title: // value for 'title'
  *   },
  * });
  */
-export function useCreatetaskMutation(baseOptions?: Apollo.MutationHookOptions<CreatetaskMutation, CreatetaskMutationVariables>) {
+export function useCreateTaskMutation(baseOptions?: Apollo.MutationHookOptions<CreateTaskMutation, CreateTaskMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreatetaskMutation, CreatetaskMutationVariables>(CreatetaskDocument, options);
+        return Apollo.useMutation<CreateTaskMutation, CreateTaskMutationVariables>(CreateTaskDocument, options);
       }
-export type CreatetaskMutationHookResult = ReturnType<typeof useCreatetaskMutation>;
-export type CreatetaskMutationResult = Apollo.MutationResult<CreatetaskMutation>;
-export type CreatetaskMutationOptions = Apollo.BaseMutationOptions<CreatetaskMutation, CreatetaskMutationVariables>;
-export const DeletetaskDocument = gql`
-    mutation deletetask($deleteTaskId: Int!) {
+export type CreateTaskMutationHookResult = ReturnType<typeof useCreateTaskMutation>;
+export type CreateTaskMutationResult = Apollo.MutationResult<CreateTaskMutation>;
+export type CreateTaskMutationOptions = Apollo.BaseMutationOptions<CreateTaskMutation, CreateTaskMutationVariables>;
+export const DeleteDocument = gql`
+    mutation delete($deleteTaskId: Int!) {
   deleteTask(id: $deleteTaskId)
 }
     `;
-export type DeletetaskMutationFn = Apollo.MutationFunction<DeletetaskMutation, DeletetaskMutationVariables>;
+export type DeleteMutationFn = Apollo.MutationFunction<DeleteMutation, DeleteMutationVariables>;
 
 /**
- * __useDeletetaskMutation__
+ * __useDeleteMutation__
  *
- * To run a mutation, you first call `useDeletetaskMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDeletetaskMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useDeleteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [deletetaskMutation, { data, loading, error }] = useDeletetaskMutation({
+ * const [deleteMutation, { data, loading, error }] = useDeleteMutation({
  *   variables: {
  *      deleteTaskId: // value for 'deleteTaskId'
  *   },
  * });
  */
-export function useDeletetaskMutation(baseOptions?: Apollo.MutationHookOptions<DeletetaskMutation, DeletetaskMutationVariables>) {
+export function useDeleteMutation(baseOptions?: Apollo.MutationHookOptions<DeleteMutation, DeleteMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeletetaskMutation, DeletetaskMutationVariables>(DeletetaskDocument, options);
+        return Apollo.useMutation<DeleteMutation, DeleteMutationVariables>(DeleteDocument, options);
       }
-export type DeletetaskMutationHookResult = ReturnType<typeof useDeletetaskMutation>;
-export type DeletetaskMutationResult = Apollo.MutationResult<DeletetaskMutation>;
-export type DeletetaskMutationOptions = Apollo.BaseMutationOptions<DeletetaskMutation, DeletetaskMutationVariables>;
+export type DeleteMutationHookResult = ReturnType<typeof useDeleteMutation>;
+export type DeleteMutationResult = Apollo.MutationResult<DeleteMutation>;
+export type DeleteMutationOptions = Apollo.BaseMutationOptions<DeleteMutation, DeleteMutationVariables>;
 export const EditTaskDocument = gql`
-    mutation editTask($title: String!, $isComplete: Boolean!, $editTaskId: Int!) {
-  editTask(title: $title, isComplete: $isComplete, id: $editTaskId) {
-    title
-    created
-    isComplete
+    mutation EditTask($title: String!, $isComplete: Boolean!, $editTaskId: Int!, $priority: String) {
+  editTask(
+    title: $title
+    isComplete: $isComplete
+    id: $editTaskId
+    priority: $priority
+  ) {
     id
+    title
+    isComplete
+    priority
+    created
     updated
   }
 }
@@ -200,6 +213,7 @@ export type EditTaskMutationFn = Apollo.MutationFunction<EditTaskMutation, EditT
  *      title: // value for 'title'
  *      isComplete: // value for 'isComplete'
  *      editTaskId: // value for 'editTaskId'
+ *      priority: // value for 'priority'
  *   },
  * });
  */
@@ -211,14 +225,14 @@ export type EditTaskMutationHookResult = ReturnType<typeof useEditTaskMutation>;
 export type EditTaskMutationResult = Apollo.MutationResult<EditTaskMutation>;
 export type EditTaskMutationOptions = Apollo.BaseMutationOptions<EditTaskMutation, EditTaskMutationVariables>;
 export const GetsingletaskDocument = gql`
-    query getsingletask($getsingletaskId: Int!) {
+    query Getsingletask($getsingletaskId: Int!) {
   getsingletask(id: $getsingletaskId) {
-    isComplete
-    title
-    updated
     id
-    created
+    title
     isComplete
+    priority
+    created
+    updated
   }
 }
     `;
@@ -255,49 +269,50 @@ export type GetsingletaskQueryHookResult = ReturnType<typeof useGetsingletaskQue
 export type GetsingletaskLazyQueryHookResult = ReturnType<typeof useGetsingletaskLazyQuery>;
 export type GetsingletaskSuspenseQueryHookResult = ReturnType<typeof useGetsingletaskSuspenseQuery>;
 export type GetsingletaskQueryResult = Apollo.QueryResult<GetsingletaskQuery, GetsingletaskQueryVariables>;
-export const GettasksDocument = gql`
-    query gettasks {
+export const GetTasksDocument = gql`
+    query GetTasks {
   getTasks {
-    created
     id
-    isComplete
     title
+    isComplete
+    priority
+    created
     updated
   }
 }
     `;
 
 /**
- * __useGettasksQuery__
+ * __useGetTasksQuery__
  *
- * To run a query within a React component, call `useGettasksQuery` and pass it any options that fit your needs.
- * When your component renders, `useGettasksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetTasksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTasksQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGettasksQuery({
+ * const { data, loading, error } = useGetTasksQuery({
  *   variables: {
  *   },
  * });
  */
-export function useGettasksQuery(baseOptions?: Apollo.QueryHookOptions<GettasksQuery, GettasksQueryVariables>) {
+export function useGetTasksQuery(baseOptions?: Apollo.QueryHookOptions<GetTasksQuery, GetTasksQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GettasksQuery, GettasksQueryVariables>(GettasksDocument, options);
+        return Apollo.useQuery<GetTasksQuery, GetTasksQueryVariables>(GetTasksDocument, options);
       }
-export function useGettasksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GettasksQuery, GettasksQueryVariables>) {
+export function useGetTasksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTasksQuery, GetTasksQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GettasksQuery, GettasksQueryVariables>(GettasksDocument, options);
+          return Apollo.useLazyQuery<GetTasksQuery, GetTasksQueryVariables>(GetTasksDocument, options);
         }
-export function useGettasksSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GettasksQuery, GettasksQueryVariables>) {
+export function useGetTasksSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetTasksQuery, GetTasksQueryVariables>) {
           const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GettasksQuery, GettasksQueryVariables>(GettasksDocument, options);
+          return Apollo.useSuspenseQuery<GetTasksQuery, GetTasksQueryVariables>(GetTasksDocument, options);
         }
-export type GettasksQueryHookResult = ReturnType<typeof useGettasksQuery>;
-export type GettasksLazyQueryHookResult = ReturnType<typeof useGettasksLazyQuery>;
-export type GettasksSuspenseQueryHookResult = ReturnType<typeof useGettasksSuspenseQuery>;
-export type GettasksQueryResult = Apollo.QueryResult<GettasksQuery, GettasksQueryVariables>;
+export type GetTasksQueryHookResult = ReturnType<typeof useGetTasksQuery>;
+export type GetTasksLazyQueryHookResult = ReturnType<typeof useGetTasksLazyQuery>;
+export type GetTasksSuspenseQueryHookResult = ReturnType<typeof useGetTasksSuspenseQuery>;
+export type GetTasksQueryResult = Apollo.QueryResult<GetTasksQuery, GetTasksQueryVariables>;
 export const HelloDocument = gql`
     query hello {
   hello
