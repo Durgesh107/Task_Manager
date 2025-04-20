@@ -22,8 +22,6 @@ const Tasks: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<boolean | null>(null);
   const [priority, setPriority] = useState("medium");
   
-
-
   if (loading) return (
     <div className="bg-black min-h-screen text-white flex justify-center items-center">
       <motion.div
@@ -42,7 +40,6 @@ const Tasks: React.FC = () => {
       </motion.div>
     </div>
   );
-  
   if (error) return (
     <div className="bg-black min-h-screen text-white flex justify-center items-center">
       <motion.div
@@ -125,7 +122,6 @@ const Tasks: React.FC = () => {
       toast.error("could not add the task!")
     }
   };
-  
   const openModal = (taskId: number, currentTitle: string, currentIsComplete: boolean, currentPriority: string) => {
     setEditingTaskId(taskId);
     setEditTitle(currentTitle);
@@ -153,7 +149,6 @@ const Tasks: React.FC = () => {
       }
     }
   };
-
   const taskVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: { 
@@ -172,7 +167,6 @@ const Tasks: React.FC = () => {
       }
     }
   };
-
   const modalVariants = {
     hidden: { scale: 0.8, opacity: 0 },
     visible: { 
@@ -230,8 +224,6 @@ const Tasks: React.FC = () => {
             <option value="medium">Medium</option>
             <option value="low">Easy</option>
           </motion.select>
-
-
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -280,7 +272,6 @@ const Tasks: React.FC = () => {
             </button>
           </div>
         </motion.div>
-        
         <div className="flex justify-center items-center">
           <motion.div 
             variants={containerVariants}
@@ -354,7 +345,6 @@ const Tasks: React.FC = () => {
                 </motion.div>
               ))}
             </AnimatePresence>
-            
             {filteredTasks?.length === 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -372,9 +362,7 @@ const Tasks: React.FC = () => {
           </motion.div>
           <ToastContainer/>
         </div>
-     
       </div>
-
       <AnimatePresence>
         {modalIsOpen && (
           <motion.div 
@@ -404,7 +392,6 @@ const Tasks: React.FC = () => {
                 placeholder="Update task title"
                 className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-purple-500 focus:outline-none mb-4"
               />
-              
               <motion.div 
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -431,9 +418,7 @@ const Tasks: React.FC = () => {
               </div>
              <div className="text-sm">Mark as complete</div>
             </div>
-          </motion.div>
-
-              
+          </motion.div> 
               <div className="flex justify-end gap-4">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -453,9 +438,6 @@ const Tasks: React.FC = () => {
                 </motion.button>
               </div>
             </motion.div>
-
-
-            
           </motion.div>
         )}
       </AnimatePresence>
