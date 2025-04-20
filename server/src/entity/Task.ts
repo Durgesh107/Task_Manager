@@ -4,7 +4,6 @@ import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, U
 @Entity()
 @ObjectType()
 export class Task extends BaseEntity{
-    
     @PrimaryGeneratedColumn()
     @Field(()=>Int)
     id:number;

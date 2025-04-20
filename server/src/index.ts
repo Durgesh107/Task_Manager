@@ -7,7 +7,6 @@ import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHt
 import http from "http";
 import cors from "cors";
 import { AppDataSource } from "./data-source";
-import { ContextType } from "./ContextType";
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import { TaskResolver } from "./resolvers/TaskResolver";
@@ -27,7 +26,7 @@ const bootstrap = async () => {
 
   const httpServer = http.createServer(app);
 
-  const server = new ApolloServer<ContextType>({
+  const server = new ApolloServer({
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
@@ -39,7 +38,7 @@ const bootstrap = async () => {
     cors<cors.CorsRequest>(),
     express.json(),
     expressMiddleware(server, {
-      context: async ({ req, res }): Promise<ContextType> => {
+      context: async ({ req, res }) => {
       return {
         req,
         res,
