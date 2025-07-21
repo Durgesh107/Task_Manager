@@ -1,2 +1,18 @@
 @import "tailwindcss";
 
+.Toastify__toast {
+  background-color: #374151;
+  color: white;
+}
+
+.Toastify__toast--error {
+  background-color: #ef4444;
+}
+
+.Toastify__toast--success {
+  background-color: #10b981;
+}
+
+.Toastify__toast--warning {
+  background-color: #f59e0b;
+}

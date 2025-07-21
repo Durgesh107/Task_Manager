@@ -1,5 +1,7 @@
+import { Context } from "src/types/Context";
 import { Task } from "../entity/Task";
-import { Arg, Int, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
+import { requireAuth } from "../utils/auth";
 
 
 @Resolver()
@@ -10,31 +12,38 @@ export class TaskResolver{
     }
 
     @Query(()=>[Task],{nullable:true})
-    async getTasks():Promise<Task[] |null>{
+    async getTasks(@Ctx() ctx:Context):Promise<Task[] |null>{
+        await requireAuth(ctx);
         return await Task.find();
     }
 
     @Query(()=>Task,{nullable:true})
-     getsingletask(
-        @Arg("id",()=>Int) id:number
+     async getsingletask(
+        @Arg("id",()=>Int) id:number,
+        @Ctx() ctx:Context
     ): Promise<Task | null>{
-        const task= Task.findOne({where:{id}});
-        return task;
+        await requireAuth(ctx);
+        return Task.findOne({where:{id}});
+        
     }
 
     @Mutation(()=>Task)
     async createTask(
         @Arg("title",()=>String) title:string,
-        @Arg("priority",()=>String) priority:string
+        @Arg("priority",()=>String) priority:string,
+        @Ctx() ctx:Context
     ):Promise<Task>{
+      await requireAuth(ctx);
       const task=await Task.create({title,priority,isComplete:false}).save()
       return task;
     }
 
     @Mutation(()=>Boolean)
     async deleteTask(
-        @Arg("id",()=>Int) id:number
+        @Arg("id",()=>Int) id:number,
+        @Ctx() ctx:Context
     ):Promise<boolean>{
+        await requireAuth(ctx);
         try{
             const task=await Task.delete({id});
             if (task.affected && task.affected > 0) {
@@ -54,8 +63,10 @@ export class TaskResolver{
         @Arg("id",()=>Int) id:number ,
         @Arg("isComplete",()=>Boolean) isComplete:boolean,
         @Arg("title",()=>String) title:string,
-        @Arg("priority",()=>String ,{nullable:true}) priority:string
+        @Arg("priority",()=>String ,{nullable:true}) priority:string,
+        @Ctx() ctx:Context
     ):Promise<Task | null>{
+        await requireAuth(ctx);
         const task=await Task.findOne({where:{id}})
         if(!task){
             return null;

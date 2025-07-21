@@ -14,8 +14,8 @@ const Tasks: React.FC = () => {
   const [createTask] = useCreateTaskMutation();
   const [editTask] = useEditTaskMutation();
   const [title, setTitle] = useState("");
-  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [editTitle, setEditTitle] = useState("");
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [editIsComplete, setEditIsComplete] = useState(false);
   const [editPriority, setEditPriority] = useState("medium");
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
@@ -51,9 +51,7 @@ const Tasks: React.FC = () => {
       </motion.div>
     </div>
   );
-  const filteredTasks = data?.getTasks?.filter(task => 
-    filterStatus === null ? true : task.isComplete === filterStatus
-  );
+  const filteredTasks = data?.getTasks?.filter(task => filterStatus === null ? true : task.isComplete === filterStatus);
   const handleDelete = async (id: number) => {
     try {
       await deleteTask({
@@ -207,7 +205,6 @@ const Tasks: React.FC = () => {
           className="flex flex-col md:flex-row justify-center gap-3 px-4 items-center"
         >
           <motion.input
-            whileFocus={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 400 }}
             type="text"
             placeholder="Enter your task"
@@ -264,7 +261,7 @@ const Tasks: React.FC = () => {
               onClick={() => setFilterStatus(false)}
               className={`px-3 py-1 rounded-md transition-colors ${
                 filterStatus === false 
-                  ? 'bg-blue-600 text-white' 
+                  ? 'bg-red-600 text-white' 
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
@@ -321,7 +318,7 @@ const Tasks: React.FC = () => {
                       : "bg-green-400 text-black"
                   }`}
                 >
-                  {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                  {task.priority === "high"? "Hard" : task.priority === "medium" ? "Medium": "Easy"}
                 </div>
                   </div>
                   <div className="flex gap-2">

@@ -10,6 +10,8 @@ import { AppDataSource } from "./data-source";
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import { TaskResolver } from "./resolvers/TaskResolver";
+import {AuthResolver} from "./resolvers/AuthResolver";
+import {Context} from "./types/Context";
 
 
 const bootstrap = async () => {
@@ -17,7 +19,7 @@ const bootstrap = async () => {
   console.log('database successfully connected');
 
   const schema = await buildSchema({
-    resolvers: [TaskResolver],
+    resolvers: [TaskResolver,AuthResolver],
   });
 
   const app = express();
@@ -33,19 +35,19 @@ const bootstrap = async () => {
 
   await server.start();
 
-  app.use(
-    '/graphql',
-    cors<cors.CorsRequest>(),
-    express.json(),
-    expressMiddleware(server, {
-      context: async ({ req, res }) => {
-      return {
-        req,
-        res,
-      }
-      }
-    }) as any
-  );
+   app.use(
+  '/graphql',
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  }),
+  express.json(),
+  expressMiddleware(server, {
+    context: async ({ req, res }): Promise<Context> => {
+      return { req, res }
+    }
+  })
+);
 
   const PORT = process.env.PORT ? parseInt(process.env.PORT,10) : 4000;
   await new Promise<void>(resolve =>

@@ -4,31 +4,27 @@ import { BaseEntity, Column, CreateDateColumn, Entity,  PrimaryGeneratedColumn, 
 
 @Entity()
 @ObjectType()
-export class Task extends BaseEntity{
+export class User extends BaseEntity{
     @PrimaryGeneratedColumn()
     @Field(()=>Int)
     id:number;
 
-    @Column()
     @Field(()=>String)
-    title:string;
-
     @Column()
-    @Field(()=>Boolean)
-    isComplete:boolean
+    username:string;
 
-    @Column({default:"medium"})
     @Field(()=>String)
-    priority:string
-
+    @Column({unique:true})
+    email:string;
+ 
+    @Column() 
+    password:string;
 
     @CreateDateColumn()
     @Field(()=>String)
-    created:Date
+    created: Date;
 
     @UpdateDateColumn()
     @Field(()=>String)
-    updated:Date;
+    updated: Date;
 }
-
-

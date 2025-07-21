@@ -4,17 +4,16 @@ import './index.css'
 import App from './App.tsx'
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
 
-
-
 const client = new ApolloClient({
-  uri:import.meta.env.VITE_URI ,
+  uri: import.meta.env.VITE_URI || 'http://localhost:4000/graphql',
   cache: new InMemoryCache(),
+  credentials: 'include',
 });
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ApolloProvider client={client}>
-    <App />
+      <App />
     </ApolloProvider>
   </StrictMode>,
 )

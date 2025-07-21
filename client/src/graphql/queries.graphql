@@ -22,3 +22,13 @@ query GetTasks {
 query hello{
   hello
 }
+
+query Me {
+  me {
+    id
+    email
+    username
+    created
+    updated
+  }
+}

@@ -23,3 +23,28 @@ mutation EditTask($title: String!, $isComplete: Boolean!, $editTaskId: Int!, $pr
     updated
   }
 }
+
+# Add these to your existing GraphQL operations file
+mutation Register($input: RegisterInput!) {
+  register(input: $input) {
+    id
+    email
+    username
+    created
+    updated
+  }
+}
+
+mutation Login($input: LoginInput!) {
+  login(input: $input) {
+    id
+    email
+    username
+    created
+    updated
+  }
+}
+
+mutation Logout {
+  logout
+}
